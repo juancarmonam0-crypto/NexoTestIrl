@@ -291,7 +291,7 @@ export default function App() {
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>Por Sección (1 a 25)</span>
+              <span>Por Escenario (1 a 9)</span>
             </button>
 
             <button
@@ -329,7 +329,7 @@ export default function App() {
         {/* Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left Column: 25-Section Navigation (Sticky) */}
+          {/* Left Column: Scenario Navigation (Sticky) */}
           <div className="hidden lg:block lg:col-span-4 sticky top-36">
             <SectionNav
               activeSectionIndex={activeSectionIndex}

@@ -21,7 +21,7 @@ export const SectionNav: React.FC<SectionNavProps> = ({
       <div className="flex items-center justify-between px-2 pb-2.5 mb-2 border-b border-slate-800">
         <div className="flex items-center gap-2 text-xs font-bold text-slate-300 uppercase tracking-wider">
           <Layers className="w-3.5 h-3.5 text-amber-400" />
-          <span>25 Secciones de Prueba</span>
+          <span>9 Escenarios E2E</span>
         </div>
       </div>
 

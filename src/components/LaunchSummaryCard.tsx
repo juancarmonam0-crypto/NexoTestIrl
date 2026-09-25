@@ -12,7 +12,7 @@ export const LaunchSummaryCard: React.FC<LaunchSummaryCardProps> = ({
   answers,
   onJumpToSection,
 }) => {
-  const currentStatusVal = answers['launch_status'];
+  const currentStatusVal = answers['final-status'];
   const currentStatusObj = FINAL_STATUS_OPTIONS.find((s) => s.value === currentStatusVal);
 
   // Find all failed questions
@@ -59,7 +59,7 @@ export const LaunchSummaryCard: React.FC<LaunchSummaryCardProps> = ({
             </div>
           ) : (
             <div className="text-xs text-slate-400 bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-xl">
-              ⏳ Dictamen final en Sección 25 pendiente
+              ⏳ Dictamen final en Escenario 9 pendiente
             </div>
           )}
         </div>
