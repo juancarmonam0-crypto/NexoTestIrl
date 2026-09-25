@@ -1,0 +1,6 @@
+{
+  "name": "Nexo Pre-Launch Verification Checklist",
+  "description": "Formulario y checklist operacional oficial de Nexo con 25 secciones y 383 pruebas reales antes del lanzamiento.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
