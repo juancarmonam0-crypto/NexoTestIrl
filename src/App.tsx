@@ -25,12 +25,52 @@ import {
   Sparkles,
   Search,
   Filter,
-  ArrowUp
+  ArrowUp,
+  Save
 } from 'lucide-react';
 
 const STORAGE_KEY_ANSWERS = 'nexo_qa_answers_v1';
 const STORAGE_KEY_NOTES = 'nexo_qa_notes_v1';
 const STORAGE_KEY_AUDITOR = 'nexo_qa_auditor_v1';
+const STORAGE_KEY_PROGRESS = 'nexo_qa_progress_v1';
+
+type PersistedProgress = {
+  activeSectionIndex: number;
+  viewMode: 'single' | 'all';
+};
+
+function readPersistedProgress(): PersistedProgress {
+  const fallback: PersistedProgress = { activeSectionIndex: 0, viewMode: 'single' };
+
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_PROGRESS);
+    if (!raw) return fallback;
+
+    const parsed = JSON.parse(raw) as Partial<PersistedProgress>;
+    const activeSectionIndex =
+      Number.isInteger(parsed.activeSectionIndex) &&
+      Number(parsed.activeSectionIndex) >= 0 &&
+      Number(parsed.activeSectionIndex) < SECTIONS.length
+        ? Number(parsed.activeSectionIndex)
+        : 0;
+
+    const viewMode = parsed.viewMode === 'all' ? 'all' : 'single';
+    return { activeSectionIndex, viewMode };
+  } catch {
+    return fallback;
+  }
+}
+
+function localStorageIsAvailable(): boolean {
+  try {
+    const probeKey = '__nexo_qa_storage_probe__';
+    localStorage.setItem(probeKey, '1');
+    localStorage.removeItem(probeKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export default function App() {
   // State
@@ -56,8 +96,13 @@ export default function App() {
     return localStorage.getItem(STORAGE_KEY_AUDITOR) || '';
   });
 
-  const [activeSectionIndex, setActiveSectionIndex] = useState<number>(0);
-  const [viewMode, setViewMode] = useState<'single' | 'all'>('single');
+  const [activeSectionIndex, setActiveSectionIndex] = useState<number>(
+    () => readPersistedProgress().activeSectionIndex
+  );
+  const [viewMode, setViewMode] = useState<'single' | 'all'>(
+    () => readPersistedProgress().viewMode
+  );
+  const [localPersistenceOk, setLocalPersistenceOk] = useState<boolean>(() => localStorageIsAvailable());
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -72,7 +117,9 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY_ANSWERS, JSON.stringify(answers));
+      setLocalPersistenceOk(true);
     } catch (e) {
+      setLocalPersistenceOk(false);
       console.error('Error saving answers to localStorage', e);
     }
   }, [answers]);
@@ -80,7 +127,9 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(notes));
+      setLocalPersistenceOk(true);
     } catch (e) {
+      setLocalPersistenceOk(false);
       console.error('Error saving notes to localStorage', e);
     }
   }, [notes]);
@@ -88,10 +137,23 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY_AUDITOR, auditorName);
+      setLocalPersistenceOk(true);
     } catch (e) {
+      setLocalPersistenceOk(false);
       console.error('Error saving auditor to localStorage', e);
     }
   }, [auditorName]);
+
+  useEffect(() => {
+    try {
+      const progress: PersistedProgress = { activeSectionIndex, viewMode };
+      localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(progress));
+      setLocalPersistenceOk(true);
+    } catch (e) {
+      setLocalPersistenceOk(false);
+      console.error('Error saving current checklist position to localStorage', e);
+    }
+  }, [activeSectionIndex, viewMode]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -186,8 +248,11 @@ export default function App() {
     if (confirm('¿Deseas borrar TODAS las respuestas y observaciones del checklist? Esta acción no se puede deshacer.')) {
       setAnswers({});
       setNotes({});
+      setActiveSectionIndex(0);
+      setViewMode('single');
       localStorage.removeItem(STORAGE_KEY_ANSWERS);
       localStorage.removeItem(STORAGE_KEY_NOTES);
+      localStorage.removeItem(STORAGE_KEY_PROGRESS);
       showToast('Checklist reiniciado a cero.');
     }
   };
@@ -278,6 +343,22 @@ export default function App() {
             scrollToTop();
           }}
         />
+
+        {/* Local persistence status */}
+        <div
+          className={`mb-3 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold ${
+            localPersistenceOk
+              ? 'border-emerald-800/60 bg-emerald-950/30 text-emerald-300'
+              : 'border-rose-800/60 bg-rose-950/30 text-rose-300'
+          }`}
+        >
+          <Save className="w-3.5 h-3.5 shrink-0" />
+          <span>
+            {localPersistenceOk
+              ? `Guardado automático activo en este dispositivo • Continuarás en la sección ${activeSectionIndex + 1}`
+              : 'Guardado local no disponible en este navegador. No cierres la página hasta exportar el progreso.'}
+          </span>
+        </div>
 
         {/* View Mode and Controls Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
