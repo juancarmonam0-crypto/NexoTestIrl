@@ -372,7 +372,7 @@ export default function App() {
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>Por Escenario (1 a 9)</span>
+              <span>Por Escenario</span>
             </button>
 
             <button
