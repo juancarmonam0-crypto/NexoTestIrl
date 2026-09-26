@@ -72,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
                   Checklist Operativo Oficial
                 </span>
                 <span className="text-xs text-slate-400 font-mono">
-                  v1.0 • 25 Secciones • 383 Pruebas
+                  v1.1 • 9 Escenarios • {totalItems} Pruebas
                 </span>
               </div>
               <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
